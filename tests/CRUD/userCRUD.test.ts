@@ -14,39 +14,28 @@ describe("unit", () => {
         }
 
         describe("readOne()", () => {
-            it("Should return an obj with statusCode 200 and a user when runs successfully",async () => {
+            it("Should return an obj with 200 and a user when runs successfully",async () => {
                 repository.browseOne.mockImplementationOnce(() => Promise.resolve(fakeResponse));
 
                 const findUser = await crud.readOne({ username: 'testUsername' });
 
-                expect(findUser.statusCode).toBe(200);
-                expect(findUser.data).toEqual({ response: fakeResponse });
-            });
-
-            it("Should return an obj with statusCode 500 and error message when a unknown error occour",async () => {
-                repository.browseOne.mockImplementationOnce(() => { throw new Error("Test Error!") });
-                const result = await crud.readOne({id: 'testId'});
-
-                expect(result.statusCode).toBe(500);
-                expect(result.data).toEqual({message: 'Test Error!'});
+                expect(findUser).toEqual(fakeResponse);
             });
         });
 
         describe("create()", () => {
-            it("Should return an obj with statusCode 200 and a user when runs successfully",async () => {
+            it("Should return an obj with 200 and a user when runs successfully",async () => {
                 repository.add.mockImplementationOnce(() => Promise.resolve(fakeResponse));
 
                 const createUser = await crud.create({ username: 'testUsername', userRole: 'testUserRole' });
 
-                expect(createUser.statusCode).toBe(200);
-                expect(createUser.data).toEqual({ response: fakeResponse });
+                expect(createUser).toEqual(fakeResponse);
             });
 
-            it("Should return statusCode 400 and errorMesage when userRole is not provided", async () => {
+            it("Should return 400 and errorMesage when userRole is not provided", async () => {
                 const createUser = await crud.create(JSON.parse(JSON.stringify({ username: 'testUsername' })));
-
-                expect(createUser.statusCode).toBe(400);
-                expect(createUser.data).toEqual({ message: 'Missing parameter userRole' })
+;
+                expect(createUser).toEqual({ message: 'Missing parameter userRole' })
             });
         });
     })

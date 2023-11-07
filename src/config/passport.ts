@@ -56,8 +56,6 @@ passport.use(new GoogleStrategy({
     scope: ["profile"], //general profile information
 }, async (accessToken, refreshToken, profile, cb) => {
     try {
-        console.log("SONO IL PROFILO GOOGLE:" + JSON.stringify(profile));
-
         let user = await USER_CRUD.readOne({ googleId: profile.id });
 
         if(!user){

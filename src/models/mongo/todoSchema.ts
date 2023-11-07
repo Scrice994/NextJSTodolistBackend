@@ -11,4 +11,4 @@ const todoSchema = new Schema({
 
 type Todo = InferSchemaType<typeof todoSchema>;
 
-export const TodoModel =  model<Todo>('Todo', todoSchema);
+export default model<Todo>('Todo', todoSchema);

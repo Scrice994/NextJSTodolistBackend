@@ -17,7 +17,7 @@ router.post("/signup", validateRequestSchema(signUpSchema), UsersController.Sign
 
 // router.post("/reset-password-code", requestVerificationCodeRateLimit, validateRequestSchema(requestVerificationCodeSchema), UsersController.requestResetPasswordCode);
 
-// router.post("/reset-password", validateRequestSchema(resetPasswordSchema), UsersController.resetPassword);
+// router.post("/reset-password", va lidateRequestSchema(resetPasswordSchema), UsersController.resetPassword);
 
 router.post("/login", loginRateLimit, passport.authenticate('local'), validateRequestSchema(loginSchema), UsersController.Login);
 

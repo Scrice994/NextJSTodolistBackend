@@ -8,7 +8,6 @@ export class TodoCRUD implements ICRUD<TodoEntity>{
     constructor(private repository: IRepository<TodoEntity>){}
 
     async create(todo: Omit<TodoEntity, "id">): Promise<TodoEntity> {
-
         if(!todo.text){
             throw createHttpError(400, "Missing parameter text");
         }
@@ -22,19 +21,16 @@ export class TodoCRUD implements ICRUD<TodoEntity>{
     }
 
     async readAll(obj: {[key: string]: unknown}): Promise<TodoEntity[]> {
-
         const result = await this.repository.browseAll(obj);
         return result;
     }
     
     async readOne(obj: {[key: string]: unknown}): Promise<TodoEntity> {
-
         const result = await this.repository.browseOne(obj);
         return result;
     }
 
     async updateOne(obj: Required<IEntity> & Partial<TodoEntity>): Promise<TodoEntity> {
-
         if(!obj.id){
             throw createHttpError(400, 'Missing parameter id');
         }
@@ -44,7 +40,6 @@ export class TodoCRUD implements ICRUD<TodoEntity>{
     }
 
     async deleteOne(id: string): Promise<TodoEntity> {
-
         if(!id){
             throw createHttpError(400, "Missing parameter id");
         }
@@ -54,7 +49,6 @@ export class TodoCRUD implements ICRUD<TodoEntity>{
     }
 
     async deleteAll(obj: { [key: string]: unknown; }): Promise<TodoEntity[]> {
-
         const result = await this.repository.removeAll(obj);
         return result;
     }

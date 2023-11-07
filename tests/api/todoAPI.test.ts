@@ -6,17 +6,8 @@ describe("unit", () => {
 
         const TODO_URL = "http://localhost:8080/todos";
 
-        beforeAll(async () => {
-           await testUtils.databaseConnection();
-        });
-
         beforeEach(async () => {
             await testUtils.clearDB();
-        });
-
-        afterAll(async () => {
-            await testUtils.clearDB();
-            await testUtils.closeDatabaseConnection();
         });
 
         describe("getTodos", () => {
@@ -71,3 +62,5 @@ describe("unit", () => {
         });
     });
 });
+
+

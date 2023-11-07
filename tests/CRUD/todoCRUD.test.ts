@@ -1,3 +1,4 @@
+import { BadRequest } from "http-errors";
 import { TodoCRUD } from "../../src/CRUD/TodoCRUD";
 import { RepositoryMock } from "../__mocks__/repository.mock";
 
@@ -13,145 +14,95 @@ describe("unit", () => {
         }
 
         describe("create()", () => {
-            it("Should return an obj with statusCode 200 and created Todo when runs successfully", async () => {
+            it("Should return an obj with 200 and created Todo when runs successfully", async () => {
                 repository.add.mockImplementationOnce(() => Promise.resolve(fakeResponse));
 
                 const result = await CRUD.create({text: "testText", userId: "testUserId"});
 
-                expect(result.statusCode).toBe(200);
-                expect(result.data).toEqual({ response: fakeResponse });
+                expect(result).toEqual(fakeResponse);
             });
 
-            it("Should return an obj with statusCode 400 and message when text parameter is missing",async () => {
-                const result = await CRUD.create(JSON.parse(JSON.stringify({ userId: "testUserId" })));
-
-                expect(result.statusCode).toBe(400);
-                expect(result.data).toEqual({ message: "Missing parameter text"});
+            it("Should return a message when text parameter is missing",async () => {
+                await CRUD.create(JSON.parse(JSON.stringify({ userId: "testUserId" })))
+                .catch( err => {
+                    expect(err).toBeInstanceOf(BadRequest);
+                    expect(err.message).toEqual("Missing parameter text");
+                })
             });
 
-            it("Should return an obj with statusCode 400 and message when userId parameter is missing",async () => {
-                const result = await CRUD.create(JSON.parse(JSON.stringify({ text: "testText" })));
-
-                expect(result.statusCode).toBe(400);
-                expect(result.data).toEqual({ message: "Missing parameter userId" });
-            });
-
-            it("Should return an onj with statusCode 500 and error message when a unknown error occour",async () => {
-                repository.add.mockImplementationOnce(() => { throw new Error("Test Error!") });
-                const result = await CRUD.create({ text: 'textText', userId: 'testUserId' });
-
-                expect(result.statusCode).toBe(500);
-                expect(result.data).toEqual({message: 'Test Error!'});
+            it("Should return a message when userId parameter is missing",async () => {
+                await CRUD.create(JSON.parse(JSON.stringify({ text: "testText" })))
+                .catch(err => {
+                    expect(err).toBeInstanceOf(BadRequest);
+                    expect(err.message).toEqual("Missing parameter userId");
+                })
             });
         });
 
         describe("readAll()", () => {
-            it("Should return obj with statusCode 200 and an array of todos that match the filter when runs successfully",async () => {
+            it("Should return obj with 200 and an array of todos that match the filter when runs successfully",async () => {
                 repository.browseAll.mockImplementationOnce(() => Promise.resolve([fakeResponse, fakeResponse]));
 
                 const result = await CRUD.readAll({});
 
-                expect(result.statusCode).toBe(200);
-                expect(result.data).toEqual({ response: [fakeResponse, fakeResponse]} ); 
-            });
-
-            it("Should return an onj with statusCode 500 and error message when a unknown error occour",async () => {
-                repository.browseAll.mockImplementationOnce(() => { throw new Error("Test Error!") });
-                const result = await CRUD.readAll({});
-
-                expect(result.statusCode).toBe(500);
-                expect(result.data).toEqual({message: 'Test Error!'});
+                expect(result).toEqual([fakeResponse, fakeResponse]); 
             });
         });
 
         describe("readOne()", () => {
-            it("Should return an obj with statusCode 200 and a todo when runs successfully",async () => {
+            it("Should return an obj with 200 and a todo when runs successfully",async () => {
                 repository.browseOne.mockImplementationOnce(() => Promise.resolve(fakeResponse));
 
                 const result = await CRUD.readOne({id: 'testId'});
 
-                expect(result.statusCode).toBe(200);
-                expect(result.data).toEqual({ response: fakeResponse });
-            });
-
-            it("Should return an obj with statusCode 500 and error message when a unknown error occour",async () => {
-                repository.browseOne.mockImplementationOnce(() => { throw new Error("Test Error!") });
-                const result = await CRUD.readOne({id: 'testId'});
-
-                expect(result.statusCode).toBe(500);
-                expect(result.data).toEqual({message: 'Test Error!'});
+                expect(result).toEqual(fakeResponse);
             });
         });
 
         describe("updateOne()", () => {
-            it("Should return an obj with statusCode 200 and the updatedTodo when run successfully",async () => {
+            it("Should return an obj with 200 and the updatedTodo when run successfully",async () => {
                 repository.changeOne.mockImplementationOnce(() => Promise.resolve({...fakeResponse, completed: true}));
 
                 const result = await CRUD.updateOne({id: 'testUserId', completed: true});
 
-                expect(result.statusCode).toBe(200);
-                expect(result.data).toEqual({ response: { ...fakeResponse, completed: true }});
+                expect(result).toEqual({ ...fakeResponse, completed: true });
             });
 
-            it("should return an obj with statusCode 400 and error message when an error occour",async () => {
-                const result = await CRUD.updateOne(JSON.parse(JSON.stringify({completed: true})));
-
-                expect(result.statusCode).toBe(400);
-                expect(result.data).toEqual({ message: 'Missing parameter id' });
-            });
-
-            it("Should return an onj with statusCode 500 and error message when a unknown error occour",async () => {
-                repository.changeOne.mockImplementationOnce(() => { throw new Error("Test Error!") });
-                const result = await CRUD.updateOne({id: 'testUserId', completed: true});
-
-                expect(result.statusCode).toBe(500);
-                expect(result.data).toEqual({message: 'Test Error!'});
+            it("should return an obj with 400 and error message when an error occour",async () => {
+                await CRUD.updateOne(JSON.parse(JSON.stringify({completed: true})))
+                .catch( err => {
+                    expect(err).toBeInstanceOf(BadRequest);
+                    expect(err.message).toEqual('Missing parameter id');
+                })
             });
         });
 
         describe("deleteOne()", () => {
-            it("Should return an obj with statusCode 200 and the deletedTodo when successfully",async () => {
+            it("Should return an obj with 200 and the deletedTodo when successfully",async () => {
                 repository.removeOne.mockImplementationOnce(() => Promise.resolve(fakeResponse));
 
                 const result = await CRUD.deleteOne('testUserId');
 
-                expect(result.statusCode).toBe(200);
-                expect(result.data).toEqual({ response: fakeResponse })
+                expect(result).toEqual(fakeResponse);
             });
 
-            it("Should retunr an obj with statusCode 400 and errorMessage when an error occour",async () => {
-                const result = await CRUD.deleteOne(JSON.parse(JSON.stringify("")));
-
-                expect(result.statusCode).toBe(400);
-                expect(result.data).toEqual({ message: "Missing parameter id" })
-            });
-
-            it("Should return an onj with statusCode 500 and error message when a unknown error occour",async () => {
-                repository.removeOne.mockImplementationOnce(() => { throw new Error("Test Error!") });
-                const result = await CRUD.deleteOne('testUserId');
-
-                expect(result.statusCode).toBe(500);
-                expect(result.data).toEqual({message: 'Test Error!'});
+            it("Should retunr an obj with 400 and errorMessage when an error occour",async () => {
+                await CRUD.deleteOne(JSON.parse(JSON.stringify({})))
+                .catch( err => {
+                    expect(err).toBeInstanceOf(BadRequest);
+                    expect(err.message).toEqual("Missing parameter id")
+                });
             });
         });
 
         describe("deleteAll()", () => {
-            it("Should return statusCode 200 and an array of deleted Todos when successfull",async () => {
+            it("Should return 200 and an array of deleted Todos when successfull",async () => {
                 repository.removeAll.mockImplementationOnce(() => Promise.resolve([fakeResponse, fakeResponse]));
 
                 const result = await CRUD.deleteAll({ id: 'testUserId' });
 
-                expect(result.statusCode).toBe(200);
-                expect(result.data).toEqual({ response: [fakeResponse, fakeResponse]});
+                expect(result).toEqual([fakeResponse, fakeResponse]);
             });
-
-            it("Should return an onj with statusCode 500 and error message when a unknown error occour",async () => {
-                repository.removeAll.mockImplementationOnce(() => { throw new Error("Test Error!") });
-                const result = await CRUD.deleteAll({ id: 'testUserId' });
-
-                expect(result.statusCode).toBe(500);
-                expect(result.data).toEqual({message: 'Test Error!'});
-            });
-        })
+        });
     });
 });

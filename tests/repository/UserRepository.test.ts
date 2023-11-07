@@ -22,6 +22,16 @@ describe("unit", () => {
             });
         });
 
+        describe("browseAll()", () => {
+            it("Should call findAllEntities from dataStorage and return the result", async () => {
+                dataStorage.findAllEntities.mockImplementationOnce(() => Promise.resolve(fakeResponse));
+
+                const findAllUsers = await repository.browseAll({});
+
+                expect(findAllUsers).toEqual(fakeResponse);
+            });
+        });
+
         describe("browseOne()", () => {
             it("Should call findOneEntityByKey from the dataStorage and return the result", async () => {
                 dataStorage.findOneEntityByKey.mockImplementationOnce(() => Promise.resolve(fakeResponse));
@@ -29,6 +39,16 @@ describe("unit", () => {
                 const findUser = await repository.browseOne({ username: 'testUsername' });
 
                 expect(findUser).toEqual(fakeResponse);
+            });
+        });
+
+        describe("ChangeOne()", () => {
+            it("Should call updateEntity from the dataStorage and return the result", async () => {
+                dataStorage.updateEntity.mockImplementationOnce(() => Promise.resolve(fakeResponse));
+
+                const updateUser = await repository.changeOne({ id: "testUserId" });
+
+                expect(updateUser).toEqual(fakeResponse);
             });
         });
     });

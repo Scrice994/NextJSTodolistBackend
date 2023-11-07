@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 export const databaseConnection = async () => {
   mongoose.set('strictQuery', false);
-  await mongoose.connect('mongodb://127.0.0.1:27017/TodoList');
+  return mongoose.connect('mongodb://127.0.0.1:27017/TodoList');
 };
 
 export const clearDB = async () => {

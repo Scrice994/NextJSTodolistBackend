@@ -1,18 +1,15 @@
 import bcrypt from "bcrypt";
-import crypto from "crypto";
 import { RequestHandler } from "express";
 import createHttpError from "http-errors";
-import { LoginBody, ResetPasswordBody, SignUpBody, VerificationCodeParams } from "../validation/users";
 import * as uuid from 'uuid';
 import { UserCRUD } from "../../src/CRUD/UserCRUD";
 import { MongoDataStorage } from "../../src/dataStorage/MongoDataStorage";
 import { UserEntity } from "../../src/models/UserEntity";
 import { UserRepository } from "../../src/repositories/UserRepository";
-import PasswordResetToken from "../models/mongo/passwordResetTokensSchema";
 import UserModel from "../models/mongo/userSchema";
 import assertIsDefined from "../utils/assertIsDefined";
-import { destroyAllActiveSessionsForUser } from "../utils/auth";
 import * as Email from "../utils/email";
+import { LoginBody, SignUpBody, VerificationCodeParams } from "../validation/users";
 
 const DATA_STORAGE = new MongoDataStorage<UserEntity>(UserModel);
 const USER_REPOSITORY = new UserRepository(DATA_STORAGE);

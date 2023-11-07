@@ -38,9 +38,9 @@ export class MongoDataStorage<T extends IEntity> implements IDataStorage<T>{
         if(findEntity === null){
             return findEntity;
         }
+
         const { _id, __v, ...result } = findEntity.toObject();
         return result;
-
     }
 
     async updateEntity(entity: Required<IEntity> & Partial<T>): Promise<T> {

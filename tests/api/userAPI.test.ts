@@ -5,18 +5,9 @@ describe("unit", () => {
     describe("userAPI", () => {
 
         const USER_URL = "http://localhost:8080/users";
-
-        beforeAll(async () => {
-            await testUtils.databaseConnection();
-        });
  
         beforeEach(async () => {
             await testUtils.clearDB();
-        });
- 
-        afterAll(async () => {
-            await testUtils.clearDB();
-            await testUtils.closeDatabaseConnection();
         });
         
         describe("Signup", () => {

@@ -25,7 +25,7 @@ app.use("/todos", TodosRoutes);
 
 app.use("/users", UsersRoutes);
 
-app.use((req, res, next) => {console.log(req); next(createHttpError(404, "Endpoint not found"))});
+app.use((req, res, next) => {next(createHttpError(404, "Endpoint not found"))});
 
 app.use(errorHandler);
 

@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { TodoModel } from "../models/mongo/todoSchema"
+import TodoModel from "../models/mongo/todoSchema"
 import { MongoDataStorage } from "../dataStorage/MongoDataStorage";
 import { TodoRepository } from "../repositories/TodoRepository";
 import { TodoEntity } from "../models/TodoEntity";
