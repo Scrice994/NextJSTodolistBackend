@@ -1,17 +1,11 @@
 import express from "express";
 import * as UsersController from "../controllers/users";
-import passport from "passport";
-import requiresAuth from "../middlewares/requiresAuth";
 import validateRequestSchema from "../middlewares/validateRequestSchema";
-import { loginSchema, resetPasswordSchema, signUpSchema } from "../validation/users";
-import env from "../env";
-import { loginRateLimit, requestVerificationCodeRateLimit } from "../middlewares/rate-limit";
+import { signUpSchema } from "../validation/users";
 
 const router = express.Router();
 
-router.get("/", UsersController.getUsers);
-
-router.get("/me", requiresAuth, UsersController.getAuthenticatedUser);
+router.get("/me", UsersController.getAuthenticatedUser);
 
 router.post("/signup", validateRequestSchema(signUpSchema), UsersController.Signup);
 
@@ -19,18 +13,10 @@ router.post("/signup", validateRequestSchema(signUpSchema), UsersController.Sign
 
 // router.post("/reset-password", va lidateRequestSchema(resetPasswordSchema), UsersController.resetPassword);
 
-router.post("/login", loginRateLimit, passport.authenticate('local'), validateRequestSchema(loginSchema), UsersController.Login);
+router.post("/login", UsersController.Login);
 
-router.get("/login/google", passport.authenticate('google'));
+router.post("/logout", UsersController.logout);
 
-router.get("/oauth2/redirect/google", passport.authenticate('google', {
-    successRedirect: env.WEBSITE_URL + "/todolist",
-    failureRedirect : env.WEBSITE_URL + 'authentication/login',
-    keepSessionInfo: true
-}));
-
-router.post("/logout", UsersController.logOut);
-
-router.get("/account-verification/:verificationCode", UsersController.verifyUser)
+router.get("/account-verification", UsersController.verifyUser)
 
 export default router;

@@ -1,10 +1,20 @@
 import { RequestHandler } from "express";
 import createHttpError from "http-errors";
+import { HttpClient } from "../network/httpClient";
 
-const requiresAuth: RequestHandler = (req, res, next) => {
-    if(req.user){
+const requiresAuth: RequestHandler = async (req, res, next) => {
+    try {
+        const getAuth = await new HttpClient().sendRequest("/get-authorization", {
+            method: "get",
+            headers: {
+                Cookie: req.headers.cookie
+            }
+        });
+
+        req.user = getAuth.data;
+
         next();
-    } else {
+    } catch (error) {
         next(createHttpError(401, "User not authenticated"));
     }
 }

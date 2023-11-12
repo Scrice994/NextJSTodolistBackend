@@ -35,14 +35,6 @@ export const loginSchema = yup.object({
 
 export type LoginBody = yup.InferType<typeof loginSchema>["body"];
 
-export const verificationCodeSchema = yup.object({
-    params: yup.object({
-        verificationCode: yup.string().required(),
-    })
-});
-
-export type VerificationCodeParams = yup.InferType<typeof verificationCodeSchema>["params"];
-
 export const resetPasswordSchema = yup.object({
     body: yup.object({
         email: emailSchema.required(),

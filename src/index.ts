@@ -1,15 +1,11 @@
+import cors from "cors";
 import "dotenv/config";
 import express from "express";
-import cors from "cors";
-import TodosRoutes from "./routes/todos";
-import UsersRoutes from "./routes/users";
-import session from "express-session";
-import sessionConfig from "./config/session";
-import passport from "passport";
-import "./config/passport";
-import errorHandler from "./middlewares/errorHandler";
 import createHttpError from "http-errors";
 import env from "./env";
+import errorHandler from "./middlewares/errorHandler";
+import TodosRoutes from "./routes/todos";
+import UsersRoutes from "./routes/users";
 
 export const app = express();
 
@@ -18,8 +14,6 @@ app.use(cors({
     origin: env.WEBSITE_URL,
     credentials: true
 }));
-app.use(session(sessionConfig));
-app.use(passport.authenticate("session"));
 
 app.use("/todos", TodosRoutes);
 

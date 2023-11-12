@@ -5,7 +5,6 @@ import { Schema, ValidationError } from "yup";
 const validateRequestSchema = (schema: Schema): RequestHandler => 
     async (req, res, next) => {
         try {
-            console.log(req.body)
             await schema.validate(req);
             next();
         } catch (error) {
