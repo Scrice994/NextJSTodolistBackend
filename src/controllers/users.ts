@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
-import { LoginBody, SignUpBody } from "../validation/users";
 import { HttpClient } from "../network/httpClient";
+import env from "../env";
 
 const httpClient = new HttpClient()
 
@@ -20,8 +20,7 @@ export const getAuthenticatedUser: RequestHandler = async (req, res, next) => {
     }
 }
 
-
-export const Signup: RequestHandler<unknown, unknown, SignUpBody, unknown> = async (req, res, next) => {
+export const Signup: RequestHandler = async (req, res, next) => {
     try {
         const createUser = await httpClient.sendRequest("/signup", {
             method: "post",
@@ -34,7 +33,7 @@ export const Signup: RequestHandler<unknown, unknown, SignUpBody, unknown> = asy
     }
 }
 
-export const Login: RequestHandler<unknown, unknown, LoginBody, unknown> = async (req, res, next) => {
+export const login: RequestHandler = async (req, res, next) => {
     try {
         const logUser = await httpClient.sendRequest("/login", {
             method: "post",
@@ -58,7 +57,7 @@ export const logout: RequestHandler = async (req, res, next) => {
             }
         });
 
-        res.status(200).json(logoutUser.data)
+        res.status(200).clearCookie("connect.sid", { path: "/"}).json(logoutUser.data)
     } catch (error) {
         next(error);
     }
@@ -83,3 +82,24 @@ export const verifyUser: RequestHandler<unknown, unknown, unknown, AccountVerifi
     }
 }
 
+export const createNewGroupMember: RequestHandler = async (req, res, next) => {
+    try {
+        const createUser = await httpClient.sendRequest("/group/create-member-account", {
+            method: "post",
+            headers: { Cookie: req.headers.cookie },
+            body: req.body
+        });
+
+        res.status(200).json(createUser.data);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const loginGoogle: RequestHandler = async (req, res, next) => {
+    try {
+        res.redirect(env.USER_MANAGEMENT_URL + "/login/google");
+    } catch (error) {
+        next(error);
+    }
+}

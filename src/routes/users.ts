@@ -1,22 +1,20 @@
 import express from "express";
 import * as UsersController from "../controllers/users";
-import validateRequestSchema from "../middlewares/validateRequestSchema";
-import { signUpSchema } from "../validation/users";
 
 const router = express.Router();
 
 router.get("/me", UsersController.getAuthenticatedUser);
 
-router.post("/signup", validateRequestSchema(signUpSchema), UsersController.Signup);
+router.post("/signup", UsersController.Signup);
 
-// router.post("/reset-password-code", requestVerificationCodeRateLimit, validateRequestSchema(requestVerificationCodeSchema), UsersController.requestResetPasswordCode);
+router.post("/login", UsersController.login);
 
-// router.post("/reset-password", va lidateRequestSchema(resetPasswordSchema), UsersController.resetPassword);
-
-router.post("/login", UsersController.Login);
+router.get("/login/google", UsersController.loginGoogle);
 
 router.post("/logout", UsersController.logout);
 
-router.get("/account-verification", UsersController.verifyUser)
+router.get("/account-verification", UsersController.verifyUser);
+
+router.post("/group/create-member-account", UsersController.createNewGroupMember);
 
 export default router;

@@ -4,7 +4,7 @@ import { HttpClient } from "../network/httpClient";
 
 const requiresAuth: RequestHandler = async (req, res, next) => {
     try {
-        const getAuth = await new HttpClient().sendRequest("/get-authorization", {
+        const getAuth = await new HttpClient().sendRequest("/me", {
             method: "get",
             headers: {
                 Cookie: req.headers.cookie
