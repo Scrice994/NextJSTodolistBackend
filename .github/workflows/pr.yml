@@ -5,6 +5,7 @@ on:
   workflow_dispatch:
     
 env:
+  USER_MANAGEMENT_RUL: http://localhost:4000
   TODOLIST_BACKEND_URL: http://localhost:8080
   WEBSITE_URL: http://localhost:3000
   SERVER_URL: http://localhost:4000
