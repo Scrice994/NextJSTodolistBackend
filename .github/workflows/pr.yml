@@ -5,28 +5,43 @@ on:
   workflow_dispatch:
 
 jobs:
-  commit:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
       - name: Start MongoDB 6.0
         uses: supercharge/mongodb-github-action@1.9.0
 
-      - name: npm-ci
+      - name: Checkout this repo
+        uses: actions/checkout@v3
+
+      - name: install bff dependencies
         run: npm ci
+      
+      - name: unit tests
+        run: npm run test
 
-      - name: unit
-        run: npm run test:unit
+      - name: Checkout the user_management repo
+        uses: actions/checkout@v3
+        with:
+          repository: Scrice994/NextJSTodolistUserManagement
+          path: user_management
+        
+      - name: install user_management dependencies
+        uses: bahmutov/npm-install@v1
+        with:
+          working-directory: user_management
+      
 
-      - name: build
-        run: npm run build
-
-      - name: test-api
+      - name: Start user_management server
         run: |
+          cd user_management
+          npm run build
+          npm start &
+
+      - name: start bff and run tests
+        run: |
+          npm build
           npm start &
           npm run test:api
+
+        
