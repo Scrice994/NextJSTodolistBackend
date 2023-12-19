@@ -7,7 +7,7 @@
       ],
       "skipLibCheck": true,
       "baseUrl": "./",
-      "outDir": "./dist",
+      "outDir": "./prod",
       "declaration": true,
       "strict": true,
       "noImplicitAny": false,
@@ -35,6 +35,6 @@
   "exclude": [
       "node_modules",
       "tests",
-      "dist"
+      "prod"
   ],
 }

@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "build": "npx tsc",
-    "start": "node dist/server.js",
+    "start": "node prod/server.js",
     "start:dev": "nodemon --esm src/server.ts",
     "lint": "eslint . --ext .ts",
     "test": "jest --config ./jest.config.js",
