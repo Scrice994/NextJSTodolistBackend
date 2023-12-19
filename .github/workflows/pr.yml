@@ -36,23 +36,39 @@ jobs:
           repository: Scrice994/NextJSTodolistUserManagement
           path: user_management
 
+      - name: Install user_management dependencies
+        working-directory: ./user_management
+        run:  npm ci
+
+      - name: Build user_management 
+        working-directory: ./user_management
+        run:  npm run build
+
+      - name: Start SMPT server
+        working-directory: ./user_management
+        run:  npm run start:mock &
+
       - name: Start user_management server
+        working-directory: ./user_management
         env:
           PORT: 4000
-        run: |
-          cd user_management
-          npm ci
-          npm run build
-          npm start &
+        run:  npm start &
 
-      - name: start bff and run tests
-        env: 
+      - name: install bff dependencies
+        run: npm ci
+
+      - name: run bff unit test
+        run: npm run test
+      
+      - name: build bff
+        run: npm run build
+      
+      - name: start bff server
+        env:
           PORT: 8080
-        run: |
-          npm ci
-          npm run test
-          npm run build
-          npm start &
-          npm run test:api
+        run: npm start &
+      
+      - name: run bff test api
+        run: npm run test:api
 
         
