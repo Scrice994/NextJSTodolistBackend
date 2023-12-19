@@ -49,14 +49,12 @@ jobs:
 
       - name: Start user_management server
         run: |
-          echo ${{ secrets.GOOGLE_CLIENT_ID }}
           cd user_management
           npm run build
           npm start &
 
       - name: start bff and run tests
         run: |
-          cd ..
           npm run build
           npm start &
           npm run test:api
