@@ -41,15 +41,11 @@ jobs:
         with:
           repository: Scrice994/NextJSTodolistUserManagement
           path: user_management
-        
-      - name: install user_management dependencies
-        uses: bahmutov/npm-install@v1
-        with:
-          working-directory: user_management
 
       - name: Start user_management server
         run: |
           cd user_management
+          npm ci
           npm run build
           npm start &
 
