@@ -40,7 +40,8 @@ jobs:
 
       - name: Start user_management server
         run: |
-          cd user_managment
+          cd main
+          cd user_management
           npm ci
           npm run build
           npm start &
