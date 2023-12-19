@@ -5,6 +5,7 @@
       "lib": [
           "es2018"
       ],
+      "skipLibCheck": true,
       "baseUrl": "./",
       "outDir": "./dist",
       "declaration": true,
