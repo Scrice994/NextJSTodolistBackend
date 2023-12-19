@@ -6,7 +6,7 @@
           "es2018"
       ],
       "baseUrl": "./",
-      "outDir": "./prod",
+      "outDir": "./dist",
       "declaration": true,
       "strict": true,
       "noImplicitAny": false,
@@ -34,6 +34,7 @@
   "exclude": [
       "node_modules",
       "tests",
-      "prod"
+      "dist",
+      "user_management"
   ],
 }
