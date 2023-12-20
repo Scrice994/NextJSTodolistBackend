@@ -48,11 +48,7 @@ export const updateTodo: RequestHandler<UpdateTodoParams, unknown, UpdateTodoBod
         const findTodoToUpdate = await TODO_CRUD.readOne({ id: todoToUpdateId });
 
         if(findTodoToUpdate === null){
-            throw createHttpError(404);
-        }
-
-        if(findTodoToUpdate.userId !== authenticatedUser.id){
-            throw createHttpError(401);
+            throw createHttpError(404, "Resource not found");
         }
 
         const updatedTodo = await TODO_CRUD.updateOne({ id: todoToUpdateId, ...valuesToUpdate });
@@ -71,11 +67,7 @@ export const deleteTodo: RequestHandler<DeleteTodoParams, unknown, unknown, unkn
         const findTodoToDelete = await TODO_CRUD.readOne({ id: todoId });
 
         if(findTodoToDelete === null){
-            throw createHttpError(404);
-        }
-
-        if(findTodoToDelete.userId !== authenticatedUser.id){
-            throw createHttpError(401);
+            throw createHttpError(404, "Resource not found");
         }
 
         const deletedTodo = await TODO_CRUD.deleteOne(todoId);
