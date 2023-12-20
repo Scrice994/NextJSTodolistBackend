@@ -17,7 +17,6 @@ export const getTodos: RequestHandler = async (req, res, next) => {
     const authenticatedUser = req.user;
     try {
         assertIsDefined(authenticatedUser);
-
         const findAllTodos = await TODO_CRUD.readAll({ userId: authenticatedUser.id });
         res.status(200).json(findAllTodos);
     } catch (error) {
@@ -28,7 +27,6 @@ export const getTodos: RequestHandler = async (req, res, next) => {
 export const createTodo: RequestHandler<unknown, unknown, todoBody, unknown> = async (req, res, next) => {
     const { text, description } = req.body;
     const authenticatedUser = req.user;
-    
     try {
         assertIsDefined(authenticatedUser);
 
@@ -44,7 +42,6 @@ export const updateTodo: RequestHandler<UpdateTodoParams, unknown, UpdateTodoBod
     const todoToUpdateId = req.params.todoId;
     const { ...valuesToUpdate } = req.body;
     const authenticatedUser = req.user;
-
     try {
         assertIsDefined(authenticatedUser);
 
@@ -68,7 +65,6 @@ export const updateTodo: RequestHandler<UpdateTodoParams, unknown, UpdateTodoBod
 export const deleteTodo: RequestHandler<DeleteTodoParams, unknown, unknown, unknown> = async (req, res, next) => {
     const todoId = req.params.todoId;
     const authenticatedUser = req.user;
-
     try {
         assertIsDefined(authenticatedUser);
 
@@ -91,7 +87,6 @@ export const deleteTodo: RequestHandler<DeleteTodoParams, unknown, unknown, unkn
 
 export const deleteAlltodos: RequestHandler = async (req, res, next) => {
     const authenticatedUser = req.user;
-
     try {
         assertIsDefined(authenticatedUser);
 

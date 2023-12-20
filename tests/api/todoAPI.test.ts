@@ -5,6 +5,11 @@ describe("unit", () => {
     describe("todoAPI", () => {
 
         const TODO_URL = "http://localhost:8080/todos";
+        const USER_URL = "http://localhost:8080/users";
+        const testUserCredentials = {
+            username: "testUsername", 
+            password: "testPassword",
+        }
 
         beforeEach(async () => {
             await testUtils.clearDB();
@@ -12,52 +17,102 @@ describe("unit", () => {
 
         describe("getTodos", () => {
             it("Should return all todos in the db",async () => {
-                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'});
-                const createTodo2 = await axios.post(TODO_URL, {text: 'testText2', userId: 'testUserId'});
-                const findTodos = await axios.get(TODO_URL);
+                await testUtils.initializeActiveAccount();
+                const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
+                
+                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
+
+                const createTodo2 = await axios.post(TODO_URL, {text: 'testText2', userId: 'testUserId'}, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
+
+                const findTodos = await axios.get(TODO_URL, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
 
                 expect(findTodos.status).toBe(200);
-                expect(findTodos.data).toEqual({
-                    response: [createTodo.data.response, createTodo2.data.response]
-                })
+                expect(findTodos.data).toEqual([createTodo.data, createTodo2.data]);
             });
         });
 
         describe("createTodo", () => {
-            it("should create a new Todo in the db",async () => {
-                const createTodo = await axios.post(TODO_URL, {text: 'testText2', userId: 'testUserId'});
+            it("should return the new todo",async () => {
+                await testUtils.initializeActiveAccount();
+                const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
 
-                const findTodo = await axios.get(TODO_URL);
+                const createTodo = await axios.post(TODO_URL, {text: 'testText2', userId: 'testUserId'}, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
+
+                const findTodo = await axios.get(TODO_URL, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
 
                 expect(createTodo.status).toBe(200);
-                expect(createTodo.data).toEqual({
-                    response: findTodo.data.response[0]
-                });
+                expect(createTodo.data).toEqual(findTodo.data[0]);
             });
         });
 
         describe("updateTodo", () => {
             it("Should update an existing Todo in the db",async () => {
-                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'});
+                await testUtils.initializeActiveAccount();
+                const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
 
-                const completeTodo = await axios.put(`${TODO_URL}/${createTodo.data.response.id}`, { completed: true });
+                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
+
+                const completeTodo = await axios.put(`${TODO_URL}/${createTodo.data.id}`, { completed: true, text: "updatedText" }, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
 
                 expect(completeTodo.status).toBe(200);
-                expect(completeTodo.data.response).toEqual({ ...createTodo.data.response, completed: true, updatedAt: completeTodo.data.response.updatedAt });
+                expect(completeTodo.data).toEqual({ ...createTodo.data, completed: true, text: "updatedText", updatedAt: completeTodo.data.updatedAt });
             });
         });
 
         describe("deleteTodo", () => {
             it("Should delete the todo in the db with the given id",async () => {
-                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'});
+                await testUtils.initializeActiveAccount();
+                const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
 
-                const deletedTodo = await axios.delete(`${TODO_URL}/${createTodo.data.response.id}`);
+                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
 
-                const findTodo = await axios.get(TODO_URL);
+                const deletedTodo = await axios.delete(`${TODO_URL}/${createTodo.data.id}`, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
+
+                const findTodo = await axios.get(TODO_URL, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
 
                 expect(deletedTodo.status).toBe(200);
-                expect(deletedTodo.data.response).toEqual(createTodo.data.response);
-                expect(findTodo.data.response).toEqual([]);
+                expect(deletedTodo.data).toEqual(createTodo.data);
+                expect(findTodo.data).toEqual([]);
             });
         });
     });
