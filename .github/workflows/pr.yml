@@ -22,7 +22,6 @@ jobs:
     runs-on: ubuntu-latest
     environment: ENV_FILE
     steps:
-      - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -36,6 +35,11 @@ jobs:
           repository: Scrice994/NextJSTodolistUserManagement
           path: user_management
 
+      - name: Checkout this repo
+        uses: actions/checkout@v3
+        with:
+          path: backend
+
       - name: Install user_management dependencies
         working-directory: ./user_management
         run:  npm ci
@@ -44,7 +48,7 @@ jobs:
         working-directory: ./user_management
         run:  npm run build
 
-      - name: Start SMPT server
+      - name: Start SMTP server
         working-directory: ./user_management
         run:  npm run start:mock &
 
@@ -55,20 +59,25 @@ jobs:
         run:  npm start &
 
       - name: install bff dependencies
+        working-directory: ./backend
         run: npm ci
 
       - name: run bff unit test
+        working-directory: ./backend
         run: npm run test
       
       - name: build bff
+        working-directory: ./backend
         run: npm run build
       
       - name: start bff server
+        working-directory: ./backend
         env:
           PORT: 8080
         run: npm start &
       
       - name: run bff test api
+        working-directory: ./backend
         run: npm run test:api
 
         
