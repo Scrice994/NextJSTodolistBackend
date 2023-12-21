@@ -1,5 +1,5 @@
 import axios from "axios";
-import * as testUtils from "./mongoTestUtils";
+import * as testUtils from "./utils/mongoTestUtils";
 
 describe("unit", () => {
     describe("userAPI", () => {
