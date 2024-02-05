@@ -58,6 +58,25 @@ export const updateTodo: RequestHandler<UpdateTodoParams, unknown, UpdateTodoBod
     }
 }
 
+export const toggleTodo: RequestHandler<UpdateTodoParams, unknown, unknown, unknown> = async(req, res, next) => {
+    const todoToUpdateId = req.params.todoId;
+    const authenticatedUser = req.user;
+    try {
+        assertIsDefined(authenticatedUser);
+
+        const findTodoToUpdate = await TODO_CRUD.readOne({ id: todoToUpdateId });
+
+        if(findTodoToUpdate === null){
+            throw createHttpError(404, "Resource not found");
+        }
+
+        const updatedTodo = await TODO_CRUD.updateOne({ id: todoToUpdateId, completed: !findTodoToUpdate.completed }, false);
+        res.status(200).json(updatedTodo);
+    } catch (error) {
+        next(error);
+    }
+}
+
 export const deleteTodo: RequestHandler<DeleteTodoParams, unknown, unknown, unknown> = async (req, res, next) => {
     const todoId = req.params.todoId;
     const authenticatedUser = req.user;

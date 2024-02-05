@@ -5,7 +5,7 @@ export interface IRepository<T extends IEntity>{
     add(obj: Omit<T, 'id'>): Promise<T>;
     browseAll(obj: {[key: string]: unknown}): Promise<T[]>;
     browseOne(obj: {[key: string]: unknown}, select?: string): Promise<T>;
-    changeOne(obj: Required<IEntity> & Partial<T>): Promise<T>;
+    changeOne(obj: Required<IEntity> & Partial<T>, updateTimestamps?: boolean): Promise<T>;
     removeOne(id: DataStorageId): Promise<T>;
     removeAll(obj: {[key: string]: unknown}): Promise<T[]>;
 }

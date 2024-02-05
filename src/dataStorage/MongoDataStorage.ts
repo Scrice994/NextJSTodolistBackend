@@ -43,9 +43,20 @@ export class MongoDataStorage<T extends IEntity> implements IDataStorage<T>{
         return result;
     }
 
-    async updateEntity(entity: Required<IEntity> & Partial<T>): Promise<T> {
+    async updateEntity(entity: Required<IEntity> & Partial<T>, updateTimestamp?: boolean): Promise<T> {
+        if(updateTimestamp === undefined){
+            updateTimestamp = true
+        }
+
         const { id, ...toUpdate } = entity;
-        const updatedEntity = await this._model.findOneAndUpdate({ id }, toUpdate, { new: true });
+        let updatedEntity;
+
+        if(!updateTimestamp){
+            updatedEntity = await this._model.findOneAndUpdate({ id }, toUpdate, { new: true, timestamps: false });
+        } else {
+            updatedEntity = await this._model.findOneAndUpdate({ id }, toUpdate, { new: true, timestamps: true });
+        }
+
         const { __v, _id, ...result } = updatedEntity.toObject();
         return result;
     }

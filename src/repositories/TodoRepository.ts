@@ -21,8 +21,8 @@ export class TodoRepository implements IRepository<TodoEntity>{
         return result;
     }
 
-    async changeOne(obj: Required<IEntity> & Partial<TodoEntity>): Promise<TodoEntity> {
-        const result = await this.dataStorage.updateEntity(obj);
+    async changeOne(obj: Required<IEntity> & Partial<TodoEntity>, updateTimestamps?: boolean): Promise<TodoEntity> {
+        const result = await this.dataStorage.updateEntity(obj, updateTimestamps);
         return result;
     }
 

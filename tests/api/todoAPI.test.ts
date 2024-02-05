@@ -76,7 +76,7 @@ describe("unit", () => {
                     }
                 });
 
-                const completeTodo = await axios.put(`${TODO_URL}/${createTodo.data.id}`, { completed: true, text: "updatedText" }, {
+                const completeTodo = await axios.put(`${TODO_URL}/update/${createTodo.data.id}`, { completed: true, text: "updatedText" }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -96,7 +96,7 @@ describe("unit", () => {
                     }
                 });
 
-                const completeTodo = await axios.put(`${TODO_URL}/${"testTodoId"}`, { completed: true, text: "updatedText" }, {
+                const completeTodo = await axios.put(`${TODO_URL}/update/${"testTodoId"}`, { completed: true, text: "updatedText" }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -107,6 +107,28 @@ describe("unit", () => {
                 })
 
                 expect(completeTodo).toBeUndefined();
+            });
+        });
+
+        describe.only("toggleTodo", () => {
+            it("Should return a todo with the completed key updated", async () => {
+                await testUtils.initializeActiveAccount();
+                const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
+
+                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
+
+                const completeTodo = await axios.put(`${TODO_URL}/toggle/${createTodo.data.id}`, {}, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
+
+                expect(completeTodo.status).toBe(200);
+                expect(completeTodo.data).toEqual({ ...createTodo.data, completed: true });
             });
         });
 

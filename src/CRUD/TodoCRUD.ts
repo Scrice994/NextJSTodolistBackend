@@ -30,12 +30,12 @@ export class TodoCRUD implements ICRUD<TodoEntity>{
         return result;
     }
 
-    async updateOne(obj: Required<IEntity> & Partial<TodoEntity>): Promise<TodoEntity> {
+    async updateOne(obj: Required<IEntity> & Partial<TodoEntity>, updateTimestamps?: boolean): Promise<TodoEntity> {
         if(!obj.id){
             throw createHttpError(400, 'Missing parameter id');
         }
 
-        const result = await this.repository.changeOne(obj);
+        const result = await this.repository.changeOne(obj, updateTimestamps);
         return result;
     }
 

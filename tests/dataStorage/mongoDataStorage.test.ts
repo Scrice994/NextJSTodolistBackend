@@ -83,6 +83,17 @@ describe("unit", () => {
 
                 expect(updatedEntity).toEqual({ ...createEntity, completed: true, updatedAt: updatedEntity.updatedAt });
             });
+
+            it("Should return the updated entity from the db but without update UpdateAt key", async () => {
+                const createEntity = await TodoDataStorage.createEntity({
+                    text: 'testText',
+                    userId: 'testUserId'
+                });
+
+                const updatedEntity = await TodoDataStorage.updateEntity({ id: createEntity.id, completed: true }, false);
+
+                expect(updatedEntity).toEqual({ ...createEntity, completed: true });
+            });
         });
 
         describe("deleteEntity()", () => {
