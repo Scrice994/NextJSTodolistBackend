@@ -13,6 +13,8 @@ router.post("/", requiresAuth, createTodoRateLimit, validateRequestSchema(create
 
 router.delete("/delete-todos", requiresAuth, TodosController.deleteAlltodos);
 
+router.get("/:todoId", requiresAuth, TodosController.getTodo);
+
 router.put("/toggle/:todoId", requiresAuth, TodosController.toggleTodo);
 
 router.put("/update/:todoId", requiresAuth, validateRequestSchema(updateTodoSchema),TodosController.updateTodo);

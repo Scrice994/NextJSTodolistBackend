@@ -24,6 +24,18 @@ export const getTodos: RequestHandler = async (req, res, next) => {
     }
 }
 
+export const getTodo: RequestHandler = async (req, res, next) => {
+    const todoId = req.params.todoId;
+    const authenticatedUser = req.user;
+    try {
+        assertIsDefined(authenticatedUser);
+        const findTodo = await TODO_CRUD.readOne({ id: todoId });
+        res.status(200).json(findTodo);
+    } catch (error) {
+        next(error);
+    }
+}
+
 export const createTodo: RequestHandler<unknown, unknown, todoBody, unknown> = async (req, res, next) => {
     const { text, description } = req.body;
     const authenticatedUser = req.user;

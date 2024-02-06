@@ -43,6 +43,28 @@ describe("unit", () => {
             });
         });
 
+        describe("getTodo", () => {
+            it("Should return a todo with the given Id", async () => {
+                await testUtils.initializeActiveAccount();
+                const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
+                
+                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
+
+                const findTodo = await axios.get(TODO_URL + `/${createTodo.data.id}`, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
+
+                expect(findTodo.status).toBe(200);
+                expect(findTodo.data).toEqual(createTodo.data);
+            })
+        })
+
         describe("createTodo", () => {
             it("should return the new todo",async () => {
                 await testUtils.initializeActiveAccount();
@@ -110,7 +132,7 @@ describe("unit", () => {
             });
         });
 
-        describe.only("toggleTodo", () => {
+        describe("toggleTodo", () => {
             it("Should return a todo with the completed key updated", async () => {
                 await testUtils.initializeActiveAccount();
                 const logIn = await axios.post(USER_URL + "/login", testUserCredentials);

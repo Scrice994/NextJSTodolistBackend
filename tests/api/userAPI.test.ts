@@ -137,5 +137,22 @@ describe("unit", () => {
                 expect(login.data).toEqual({...user, status: "Active", updatedAt: verifyAccount.data.updatedAt });
             });
         });
+
+        describe("/change-username", () => {
+            it("should return updated user with the given username", async () => {
+                const createUser = await testUtils.initializeActiveAccount();
+                const { email, password, ...newUser } = createUser;
+                const login = await axios.post(USER_BASE_URL + "/login", testUserCredentials);
+                const changeUsername = await axios.put(USER_BASE_URL + "/change-username",{ username: "updatedUsername" }, {
+                    headers: {
+                        Cookie: login.headers["set-cookie"]
+                    }
+                });
+                changeUsername.data.createdAt = new Date(changeUsername.data.createdAt);
+                changeUsername.data.updatedAt = new Date(changeUsername.data.updatedAt);
+
+                expect(changeUsername.data).toEqual({ ...newUser, username: "updatedUsername", updatedAt: changeUsername.data.updatedAt });
+            });
+        });
     });
 });

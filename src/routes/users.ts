@@ -17,4 +17,6 @@ router.get("/account-verification", UsersController.verifyUser);
 
 router.post("/group/create-member-account", UsersController.createNewGroupMember);
 
+router.put("/change-username", UsersController.changeUsername);
+
 export default router;
