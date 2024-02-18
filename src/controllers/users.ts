@@ -1,9 +1,10 @@
 import { RequestHandler } from "express";
 import { HttpClient } from "../network/httpClient";
 import env from "../env";
+import { Producer } from "../amqp/producer";
 
 const httpClient = new HttpClient()
-
+const eventProducer = new Producer();
 
 export const getAuthenticatedUser: RequestHandler = async (req, res, next) => {
     try {

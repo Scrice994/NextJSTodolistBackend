@@ -7,11 +7,13 @@ import { TodoCRUD } from "../CRUD/TodoCRUD";
 import assertIsDefined from "../utils/assertIsDefined";
 import { DeleteTodoParams, UpdateTodoBody, UpdateTodoParams, todoBody } from "src/validation/todos";
 import createHttpError from "http-errors";
+import { Producer } from "../amqp/producer";
 
 
 const DATA_STORAGE = new MongoDataStorage<TodoEntity>(TodoModel);
 const TODO_REPOSITORY = new TodoRepository(DATA_STORAGE);
 const TODO_CRUD = new TodoCRUD(TODO_REPOSITORY);
+const eventProducer = new Producer();
 
 export const getTodos: RequestHandler = async (req, res, next) => {
     const authenticatedUser = req.user;
@@ -43,6 +45,12 @@ export const createTodo: RequestHandler<unknown, unknown, todoBody, unknown> = a
         assertIsDefined(authenticatedUser);
 
         const createTodo = await TODO_CRUD.create({text, description, userId: authenticatedUser.id });
+
+        if(createTodo){
+            await eventProducer.publishMessage("todo", "todo_create", { 
+                userId: authenticatedUser.id
+            });
+        }
 
         res.status(200).json(createTodo);
     } catch (error) {
@@ -83,6 +91,14 @@ export const toggleTodo: RequestHandler<UpdateTodoParams, unknown, unknown, unkn
         }
 
         const updatedTodo = await TODO_CRUD.updateOne({ id: todoToUpdateId, completed: !findTodoToUpdate.completed }, false);
+
+        if(updatedTodo){
+            await eventProducer.publishMessage("todo", "todo_toggle", {
+                userId: authenticatedUser.id,
+                completed: updatedTodo.completed
+            });
+        }
+
         res.status(200).json(updatedTodo);
     } catch (error) {
         next(error);
@@ -102,6 +118,14 @@ export const deleteTodo: RequestHandler<DeleteTodoParams, unknown, unknown, unkn
         }
 
         const deletedTodo = await TODO_CRUD.deleteOne(todoId);
+
+        if(deletedTodo){
+            await eventProducer.publishMessage("todo", "todo_delete", {
+                userId: authenticatedUser.id,
+                completed: deletedTodo.completed
+            });
+        }
+
         res.status(200).json(deletedTodo);
     } catch (error) {
         next(error);
@@ -114,6 +138,10 @@ export const deleteAlltodos: RequestHandler = async (req, res, next) => {
         assertIsDefined(authenticatedUser);
 
         const deletedTodos = await TODO_CRUD.deleteAll({ userId: authenticatedUser.id });
+
+        if(deletedTodos){
+            await eventProducer.publishMessage("todo", "todo_deleteAll", { userId: authenticatedUser.id });
+        }
 
         res.status(200).json(deletedTodos);
     } catch (error) {
