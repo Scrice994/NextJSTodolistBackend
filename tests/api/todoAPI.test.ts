@@ -10,6 +10,10 @@ describe("unit", () => {
             username: "testUsername", 
             password: "testPassword",
         }
+        const testMemberCredentials = {
+            username: "testMemberUsername", 
+            password: "testPassword",
+        }
 
         beforeEach(async () => {
             await testUtils.clearDB();
@@ -17,22 +21,22 @@ describe("unit", () => {
 
         describe("getTodos", () => {
             it("Should return all todos in the db",async () => {
-                await testUtils.initializeActiveAccount();
+                const activeUser = await testUtils.initializeActiveAccount();
                 const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
                 
-                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                const createTodo = await axios.post(TODO_URL, { text: 'testText' }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
                 });
 
-                const createTodo2 = await axios.post(TODO_URL, {text: 'testText2', userId: 'testUserId'}, {
+                const createTodo2 = await axios.post(TODO_URL, { text: 'testText2' }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
                 });
 
-                const findTodos = await axios.get(TODO_URL, {
+                const findTodos = await axios.get(TODO_URL + `/get-all-todos/${activeUser.id}`, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -48,7 +52,7 @@ describe("unit", () => {
                 await testUtils.initializeActiveAccount();
                 const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
                 
-                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                const createTodo = await axios.post(TODO_URL, {text: 'testText' }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -67,16 +71,16 @@ describe("unit", () => {
 
         describe("createTodo", () => {
             it("should return the new todo",async () => {
-                await testUtils.initializeActiveAccount();
+                const activeUser = await testUtils.initializeActiveAccount();
                 const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
 
-                const createTodo = await axios.post(TODO_URL, {text: 'testText2', userId: 'testUserId'}, {
+                const createTodo = await axios.post(TODO_URL, { text: 'testText2' }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
                 });
 
-                const findTodo = await axios.get(TODO_URL, {
+                const findTodo = await axios.get(TODO_URL + `/get-all-todos/${activeUser.id}`, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -85,6 +89,48 @@ describe("unit", () => {
                 expect(createTodo.status).toBe(200);
                 expect(createTodo.data).toEqual(findTodo.data[0]);
             });
+
+            it("should fail when user is not an Admin", async () => {
+                const activeUser = await testUtils.initializeMemberAccount();
+
+                const logIn = await axios.post(USER_URL + "/login", testMemberCredentials);
+
+                const createTodo = await axios.post(TODO_URL, {text: 'testText2'}, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                }).catch( err => {
+                    expect(err.response.status).toBe(403);
+                    expect(err.response.data).toEqual({ error: "You are not authorized" });
+                });
+
+                expect(createTodo).toBeUndefined();
+            });
+        });
+
+        describe("createMemberTodo", () => {
+            it("Should create a todo for the member with provided userId",async () => {
+                await testUtils.initializeActiveAccount();
+                const member = await testUtils.initializeMemberAccount();
+
+                const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
+
+                const todoForMember = await axios.post(`${TODO_URL}/create-member-todo/${member.id}`, { text: "testText" }, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                });
+
+                const loginMember = await axios.post(USER_URL + "/login", testMemberCredentials);
+
+                const findMemberTodos = await axios.get(TODO_URL + `/get-all-todos/${member.id}`, {
+                    headers: {
+                        Cookie: loginMember.headers["set-cookie"]
+                    }
+                });
+
+                expect(findMemberTodos.data).toEqual([todoForMember.data]);
+            });
         });
 
         describe("updateTodo", () => {
@@ -92,7 +138,7 @@ describe("unit", () => {
                 await testUtils.initializeActiveAccount();
                 const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
 
-                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                const createTodo = await axios.post(TODO_URL, { text: 'testText' }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -112,7 +158,7 @@ describe("unit", () => {
                 await testUtils.initializeActiveAccount();
                 const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
 
-                await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                await axios.post(TODO_URL, { text: 'testText' }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -130,6 +176,23 @@ describe("unit", () => {
 
                 expect(completeTodo).toBeUndefined();
             });
+
+            it("Should return 403 error when a user member try to update a todo", async () => {
+                await testUtils.initializeMemberAccount();
+                const logIn = await axios.post(USER_URL + "/login", testMemberCredentials);
+
+                const updatedTodo = await axios.put(`${TODO_URL}/update/${"testTodoId"}`, { text: "updatedText" }, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                })
+                .catch( err => {
+                    expect(err.response.status).toBe(403);
+                    expect(err.response.data).toEqual({ error: "You are not authorized" });
+                })
+
+                expect(updatedTodo).toBeUndefined();
+            });
         });
 
         describe("toggleTodo", () => {
@@ -137,7 +200,7 @@ describe("unit", () => {
                 await testUtils.initializeActiveAccount();
                 const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
 
-                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                const createTodo = await axios.post(TODO_URL, { text: 'testText' }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -156,10 +219,10 @@ describe("unit", () => {
 
         describe("deleteTodo", () => {
             it("Should delete the todo in the db with the given id",async () => {
-                await testUtils.initializeActiveAccount();
+                const activeUser = await testUtils.initializeActiveAccount();
                 const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
 
-                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                const createTodo = await axios.post(TODO_URL, { text: 'testText' }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -171,7 +234,7 @@ describe("unit", () => {
                     }
                 });
 
-                const findTodo = await axios.get(TODO_URL, {
+                const findTodo = await axios.get(TODO_URL + `/get-all-todos/${activeUser.id}`, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -186,7 +249,7 @@ describe("unit", () => {
                 await testUtils.initializeActiveAccount();
                 const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
 
-                await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                await axios.post(TODO_URL, {text: 'testText' }, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -204,32 +267,49 @@ describe("unit", () => {
 
                 expect(deletedTodo).toBeUndefined();
             });
+
+            it("should return 403 error when a user member try to delete a todo", async () => {
+                const activeMember = await testUtils.initializeMemberAccount();
+                const logIn = await axios.post(USER_URL + "/login", testMemberCredentials);
+
+                const deletedTodo = await axios.delete(`${TODO_URL}/${"testTodoId"}`, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                })
+                .catch( err => {
+                    expect(err.response.status).toBe(403);
+                    expect(err.response.data).toEqual({ error: "You are not authorized" });
+                })
+
+                expect(deletedTodo).toBeUndefined();
+            });
         });
 
         describe("deleteAllTodos", () => {
             it("Should delete all todos in the db with the given userId",async () => {
-                await testUtils.initializeActiveAccount();
+                const activeUser = await testUtils.initializeActiveAccount();
                 const logIn = await axios.post(USER_URL + "/login", testUserCredentials);
 
-                const createTodo = await axios.post(TODO_URL, {text: 'testText', userId: 'testUserId'}, {
+                const createTodo = await axios.post(TODO_URL, {text: 'testText'}, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
                 });
 
-                const createTodo2 = await axios.post(TODO_URL, {text: 'testText2', userId: 'testUserId'}, {
+                const createTodo2 = await axios.post(TODO_URL, {text: 'testText2'}, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
                 });
 
-                const deleteAllTodos = await axios.delete(`${TODO_URL}/delete-todos`, {
+                const deleteAllTodos = await axios.delete(`${TODO_URL}/delete-todos/${activeUser.id}`, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
                 });
 
-                const findTodos = await axios.get(TODO_URL, {
+                const findTodos = await axios.get(TODO_URL + `/get-all-todos/${activeUser.id}`, {
                     headers: {
                         Cookie: logIn.headers["set-cookie"]
                     }
@@ -239,6 +319,24 @@ describe("unit", () => {
                 expect(deleteAllTodos.data).toEqual([createTodo.data, createTodo2.data]);
                 expect(findTodos.data).toEqual([]);
             });
+
+            it("Should return error when a user member try to delete all todos", async () => {
+                const activeUser = await testUtils.initializeMemberAccount();
+
+                const logIn = await axios.post(USER_URL + "/login", testMemberCredentials);
+
+                const deleteAllTodos = await axios.delete(`${TODO_URL}/delete-todos/${activeUser.id}`, {
+                    headers: {
+                        Cookie: logIn.headers["set-cookie"]
+                    }
+                })
+                .catch( err => {
+                    expect(err.response.status).toBe(403);
+                    expect(err.response.data).toEqual({ error: "You are not authorized" });
+                });
+
+                expect(deleteAllTodos).toBeUndefined();
+            })
         });
     });
 });

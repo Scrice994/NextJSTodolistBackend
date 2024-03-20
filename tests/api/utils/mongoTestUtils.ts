@@ -63,7 +63,14 @@ export const initializeMemberAccount = async () => {
   const passwordRaw = "testPassword";
   const passwordHashed = await bcrypt.hash(passwordRaw, 10);
 
-  const initializedUser = await initializeEntity(UserModel, {...testUser, password: passwordHashed, status: "Active", userRole: "Member" });
+  const initializedUser = await initializeEntity(UserModel, {
+    ...testUser,
+    username: "testMemberUsername",
+    email: "testmemberemail@gmail.com",
+    password: passwordHashed, 
+    status: "Active", 
+    userRole: "Member" 
+  });
 
   return initializedUser;
 };

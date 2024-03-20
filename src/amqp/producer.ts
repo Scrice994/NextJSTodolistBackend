@@ -1,10 +1,11 @@
 import amqp from "amqplib";
+import env from "../env";
 
 export class Producer {
     private channel: amqp.Channel;
 
     private async createChannel(){
-        const connection = await amqp.connect("amqp://localhost");
+        const connection = await amqp.connect(env.EVENT_BUS_URL);
         this.channel = await connection.createChannel();
     }
 
@@ -12,7 +13,7 @@ export class Producer {
         if(!this.channel){
             await this.createChannel();
         }
-
+        
         const exchangeName = "todoEventExchange";
         await this.channel.assertExchange(exchangeName, "direct");
 

@@ -1,4 +1,5 @@
 import axios, { AxiosResponse } from "axios";
+import env from "../env";
 
 export interface Request {
     method: string
@@ -13,7 +14,7 @@ export interface IHttpClient<T> {
 export class HttpClient implements IHttpClient<any>{
 
     async sendRequest(url: string, request: Request): Promise<AxiosResponse> {
-        const result = (await axios('http://localhost:4000' + url, { ...this.requestToFetch(request), withCredentials: true }));
+        const result = (await axios(env.USER_MANAGEMENT_URL + url, { ...this.requestToFetch(request), withCredentials: true }));
         return result;
     }
 

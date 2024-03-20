@@ -1,10 +1,8 @@
 import { RequestHandler } from "express";
-import { HttpClient } from "../network/httpClient";
 import env from "../env";
-import { Producer } from "../amqp/producer";
+import { HttpClient } from "../network/httpClient";
 
-const httpClient = new HttpClient()
-const eventProducer = new Producer();
+const httpClient = new HttpClient();
 
 export const getAuthenticatedUser: RequestHandler = async (req, res, next) => {
     try {
@@ -16,6 +14,21 @@ export const getAuthenticatedUser: RequestHandler = async (req, res, next) => {
         });
 
         res.status(getUser.status).json(getUser.data);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const getMembers: RequestHandler = async (req, res, next) => {
+    try {
+        const findMembers = await httpClient.sendRequest("/group/get-members", {
+            method: "get",
+            headers: {
+                Cookie: req.headers.cookie
+            }
+        });
+
+        res.status(findMembers.status).json(findMembers.data);
     } catch (error) {
         next(error);
     }

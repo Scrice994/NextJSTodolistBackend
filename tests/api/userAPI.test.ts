@@ -111,6 +111,35 @@ describe("unit", () => {
             })
         });
 
+        describe("/get-members", () => {
+            it("Should return an array with all members from group", async () => {
+                const createUser = await testUtils.initializeActiveAccount();
+                const { email, password, ...newUser } = createUser;
+
+                const login = await axios.post(USER_BASE_URL + "/login", testUserCredentials);
+
+                const createFirstMember = await axios.post(USER_BASE_URL + "/group/create-member-account", { username: "testFistMember", password: "testPassword" }, {
+                    headers: {
+                        Cookie: login.headers["set-cookie"]
+                    }
+                })
+
+                const createSecondMember = await axios.post(USER_BASE_URL + "/group/create-member-account", { username: "testSecondMember", password: "testPassword" }, {
+                    headers: {
+                        Cookie: login.headers["set-cookie"]
+                    }
+                })
+
+                const findMembers = await axios.get(USER_BASE_URL + "/group/get-members", {
+                    headers: {
+                        Cookie: login.headers["set-cookie"]
+                    }
+                })
+
+                expect(findMembers.data).toEqual([createFirstMember.data, createSecondMember.data])
+            });
+        })
+
         describe("/account-verification", () => {
             it("Should return the user entity with status 'Active' when runs successfully", async() => {
                 const newPendingAccount = await testUtils.initializePendingAccount();
